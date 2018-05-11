@@ -1,8 +1,8 @@
 # Docker image for react native.
 
-FROM node:4.1.1
+FROM node:8.11.1
 
-MAINTAINER Maxime Demolin <akbarova.armia@gmail.com>
+MAINTAINER Spencer <https://github.com/sdelcore>
 
 
 # Setup environment variables
@@ -42,22 +42,25 @@ RUN (while true ; do sleep 5; echo y; done) | android update sdk --no-ui --force
 
 
 # Install node modules
-
+RUN npm config set registry https://registry.npm.taobao.org --global
+RUN npm config set disturl https://npm.taobao.org/dist --global
 ## Install yarn
 RUN npm install -g yarn
+RUN yarn config set registry https://registry.npm.taobao.org --global
+RUN yarn config set disturl https://npm.taobao.org/dist --global
 
 ## Install react native
-RUN npm install -g react-native-cli@1.0.0
+RUN npm install -g react-native-cli
 
 ## Clean up when done
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    npm cache clear
+    npm cache verify
 
 
 # Install watchman
 RUN git clone https://github.com/facebook/watchman.git
-RUN cd watchman && git checkout v4.7.0 && ./autogen.sh && ./configure && make && make install
+RUN cd watchman && git checkout v4.9.0 && ./autogen.sh && ./configure && make && make install
 RUN rm -rf watchman
 
 # Default react-native web server port
@@ -71,7 +74,7 @@ RUN adduser --disabled-password --gecos '' $USERNAME
 
 
 # Add Tini
-ENV TINI_VERSION v0.10.0
+ENV TINI_VERSION v0.17.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
