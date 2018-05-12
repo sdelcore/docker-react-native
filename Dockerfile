@@ -8,11 +8,18 @@ MAINTAINER Spencer <https://github.com/sdelcore>
 # Setup environment variables
 ENV PATH $PATH:node_modules/.bin
 
+RUN apt-get update -qy && \
+    echo deb http://http.debian.net/debian jessie-backports main >> /etc/apt/sources.list && \
+    apt-get update -qy && \
+    apt-get install -yt jessie-backports openjdk-8-jdk openjdk-8-jre openjdk-8-jdk-headless ca-certificates-java openjdk-8-jre-headless && \
+    update-alternatives --config java
+## Install 32bit support for Android SDK
+RUN dpkg --add-architecture i386 && \
+    apt-get update -qy && \
+    apt-get install -qy --no-install-recommends python-dev && \
+    apt-get install -qy libncurses5:i386 libc6:i386 libstdc++6:i386 lib32gcc1 lib32ncurses5 lib32z1 zlib1g:i386 unzip
 
-# Install Java
-RUN apt-get update -q && \
-	apt-get install -qy --no-install-recommends python-dev default-jdk
-
+#    apt-get install -qy --no-install-recommends openjdk-8-jdk
 
 # Install Android SDK
 
@@ -22,25 +29,27 @@ RUN apt-get update -q && \
 ENV ANDROID_SDK_FILE sdk-tools-linux-3859397.zip
 ENV ANDROID_SDK_URL https://dl.google.com/android/repository/$ANDROID_SDK_FILE
 
-## Install 32bit support for Android SDK
-RUN dpkg --add-architecture i386 && \
-    apt-get update -q && \
-    apt-get install -qy --no-install-recommends libstdc++6:i386 libgcc1:i386 zlib1g:i386 libncurses5:i386 unzip
-
-
 ## Install SDK
 ENV ANDROID_HOME /usr/local/android-sdk-linux
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+ENV _JAVA_OPTIONS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 RUN cd /usr/local && \
     wget $ANDROID_SDK_URL && \
     unzip $ANDROID_SDK_FILE -d android-sdk-linux && \
-    export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools && \
+    export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH:$ANDROID_HOME/tools/bin && \
     chgrp -R users $ANDROID_HOME && \
-    chmod -R 0775 $ANDROID_HOME && \
+    chmod -R 775 $ANDROID_HOME && \
     rm $ANDROID_SDK_FILE
+
+ADD license_accepter.sh /usr/local/
+RUN /usr/local/license_accepter.sh $ANDROID_HOME
 
 # Install android tools and system-image.
 ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/23.0.1
-RUN (while true ; do sleep 5; echo y; done) | android update sdk --no-ui --force --all --filter platform-tools,android-27,build-tools-27.0.3,extra-android-support,extra-android-m2repository,sys-img-x86_64-android-27,extra-google-m2repository
+RUN touch ~/.android/repositories.cfg
+RUN $ANDROID_HOME/tools/bin/sdkmanager --update
+RUN $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms:android-27"
+#RUN (while true ; do sleep 5; echo y; done) | android update sdk --no-ui --force --all --filter platform-tools,android-27,build-tools-27.0.3,extra-android-support,extra-android-m2repository,sys-img-x86_64-android-27,extra-google-m2repository
 
 
 # Install node modules
