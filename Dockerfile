@@ -17,7 +17,7 @@ RUN apt-get update -qy && \
 RUN dpkg --add-architecture i386 && \
     apt-get update -qy && \
     apt-get install -qy --no-install-recommends python-dev && \
-    apt-get install -qy libncurses5:i386 libc6:i386 libstdc++6:i386 lib32gcc1 lib32ncurses5 lib32z1 zlib1g:i386 unzip
+    apt-get install -qy libncurses5:i386 libc6:i386 libstdc++6:i386 lib32gcc1 lib32ncurses5 lib32z1 zlib1g:i386 unzip sudo
 
 #    apt-get install -qy --no-install-recommends openjdk-8-jdk
 
@@ -37,18 +37,25 @@ RUN cd /usr/local && \
     wget $ANDROID_SDK_URL && \
     unzip $ANDROID_SDK_FILE -d android-sdk-linux && \
     export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH:$ANDROID_HOME/tools/bin && \
-    chgrp -R users $ANDROID_HOME && \
-    chmod -R 775 $ANDROID_HOME && \
     rm $ANDROID_SDK_FILE
+
+RUN chgrp -R users $ANDROID_HOME
+RUN chmod -R 0775 $ANDROID_HOME
 
 ADD license_accepter.sh /usr/local/
 RUN /usr/local/license_accepter.sh $ANDROID_HOME
 
 # Install android tools and system-image.
 ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/23.0.1
-RUN touch ~/.android/repositories.cfg
+RUN mkdir ~/.android && touch ~/.android/repositories.cfg
 RUN $ANDROID_HOME/tools/bin/sdkmanager --update
-RUN $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms:android-27"
+#RUN $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms:android-27"
+RUN $ANDROID_HOME/tools/bin/sdkmanager "tools" "platform-tools" \
+        "build-tools;26.0.2" "build-tools;25.0.3" \
+        "platforms;android-26" "platforms;android-25" \
+        "platforms;android-24" "platforms;android-23" \
+        "extras;android;m2repository" "extras;google;m2repository"
+
 #RUN (while true ; do sleep 5; echo y; done) | android update sdk --no-ui --force --all --filter platform-tools,android-27,build-tools-27.0.3,extra-android-support,extra-android-m2repository,sys-img-x86_64-android-27,extra-google-m2repository
 
 
@@ -81,7 +88,8 @@ EXPOSE 8081
 # User creation
 ENV USERNAME dev
 
-RUN adduser --disabled-password --gecos '' $USERNAME
+RUN adduser --disabled-password --gecos sudo $USERNAME
+RUN chown -R $USERNAME:$USERNAME $ANDROID_HOME
 
 
 # Add Tini
@@ -90,6 +98,8 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
 USER $USERNAME
+
+RUN mkdir ~/.android && touch ~/.android/repositories.cfg
 
 # Set workdir
 # You'll need to run this image with a volume mapped to /home/dev (i.e. -v $(pwd):/home/dev) or override this value
