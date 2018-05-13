@@ -22,8 +22,8 @@ fi
 docker run \
        --rm \
        -it \
-       --user="$UID" \
        --privileged \
+       --user dev \
        -v /tmp/.X11-unix:/tmp/.X11-unix \
        -v /dev/bus/usb:/dev/bus/usb \
        -v /home/$USER/.android:/home/dev/.android \
