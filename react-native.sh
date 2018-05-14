@@ -3,8 +3,8 @@ docker run \
        --rm \
        -it \
        --privileged \
-       --user dev \
-       -v /dev/bus/usb:/dev/bus/usb \
-       -v $(pwd):/home/dev/app \
+       --user node \
+       -v /dev/bus/usb:/dev/bus/usb:z \
+       -v $(pwd):/home/node/app:z \
        react-native \
        react-native "$@"

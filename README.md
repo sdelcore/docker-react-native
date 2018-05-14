@@ -14,11 +14,6 @@ export PATH="$HOME/docker-react-native:$PATH"
 ## Create a new react native project
 ```
 > react-native.sh init MyAwesomeProjet
-```
-(You can safey ignore errors from `npm`.)
-
-Connect to container and install missing packages
-```
 > cd MyAwesomeProjet
 > react-native-container.sh
 dev> cd node_modules/react-native/
@@ -43,8 +38,7 @@ You will also need to access `Dev Settings > Debug server host & port for device
 and enter `localhost:8081`.
 
 # Install udev rules
-On your host system, you'll need to install the android udev rules if you want to connect your phone or tablet via USB and deploy the react native app directly to it. You can get the rules from http://source.android.com/source/51-android.rules and you can install them as follows:
-
+On your host system, you'll need to install the android udev rules if you want to connect your phone or tablet via USB and deploy the react native app directly:
 ```
 wget -S -O - https://raw.githubusercontent.com/M0Rf30/android-udev-rules/master/51-android.rules | sed "s/<username>/$USER/" | sudo tee >/dev/null /etc/udev/rules.d/51-android.rules
 sudo udevadm control --reload-rules

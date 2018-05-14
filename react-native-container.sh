@@ -23,11 +23,11 @@ docker run \
        --rm \
        -it \
        --privileged \
-       --user dev \
+       --user node \
        -v /tmp/.X11-unix:/tmp/.X11-unix \
        -v /dev/bus/usb:/dev/bus/usb \
-       -v /home/$USER/.android:/home/dev/.android \
-       -v $(pwd):/home/dev/app \
+       -v /home/$USER/.android:/home/node/.android \
+       -v $(pwd):/home/node/app \
        --net host \
        -e DISPLAY="$DISPLAY" \
        --name $CONTAINER_NAME \
