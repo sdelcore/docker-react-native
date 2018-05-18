@@ -29,7 +29,7 @@ RUN dpkg --add-architecture i386 && \
     apt-get install -qy --no-install-recommends python-dev && \
     apt-get install -qy libncurses5:i386 libc6:i386 \
     	libstdc++6:i386 lib32gcc1 lib32ncurses5 \
-    	lib32z1 zlib1g:i386 unzip usbutils
+    	lib32z1 zlib1g:i386 unzip usbutils tmux
 
 # Install node modules
 #RUN npm config set registry https://registry.npm.taobao.org --global
@@ -40,7 +40,7 @@ RUN npm install -g yarn
 #RUN yarn config set disturl https://npm.taobao.org/dist --global
 
 ## Install react native
-RUN npm install -g react-native-cli
+RUN npm install -g react-native-cli react-native-maps
 
 ## Clean up when done
 RUN apt-get clean && \
@@ -72,6 +72,7 @@ RUN adduser $USERNAME plugdev
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
+RUN mkdir /home/$USERNAME/.android
 RUN chmod -R 755 $PROG
 RUN chown -R $USERNAME:$USERNAME $PROG
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
