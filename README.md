@@ -1,5 +1,11 @@
 # Usage
 ## Get image
+To clear all containers and images:
+```
+docker rmi $(docker ps -a -q)
+docker rmi $(docker images -q)
+```
+
 ```
 > git clone https://github.com/sdelcore/docker-react-native
 > cd docker-react-native
@@ -42,4 +48,9 @@ On your host system, you'll need to install the android udev rules if you want t
 ```
 wget -S -O - https://raw.githubusercontent.com/M0Rf30/android-udev-rules/master/51-android.rules | sed "s/<username>/$USER/" | sudo tee >/dev/null /etc/udev/rules.d/51-android.rules
 sudo udevadm control --reload-rules
+```
+
+# Increase max watches
+```
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 ```
