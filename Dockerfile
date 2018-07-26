@@ -29,7 +29,7 @@ RUN dpkg --add-architecture i386 && \
     apt-get install -qy --no-install-recommends python-dev && \
     apt-get install -qy libncurses5:i386 libc6:i386 \
     	libstdc++6:i386 lib32gcc1 lib32ncurses5 \
-    	lib32z1 zlib1g:i386 unzip usbutils tmux nano
+    	lib32z1 zlib1g:i386 unzip usbutils tmux nano lsof
 
 # Install node modules
 #RUN npm config set registry https://registry.npm.taobao.org --global
