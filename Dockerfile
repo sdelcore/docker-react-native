@@ -16,8 +16,6 @@ ENV ANDROID_HOME $PROG/android-sdk-linux
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 ENV _JAVA_OPTIONS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 
-ENV TINI_VERSION v0.17.0
-
 RUN apt-get update -qy && \
     echo deb http://http.debian.net/debian jessie-backports main >> /etc/apt/sources.list && \
     apt-get update -qy && \
@@ -36,8 +34,6 @@ RUN dpkg --add-architecture i386 && \
 #RUN npm config set disturl https://npm.taobao.org/dist --global
 ## Install yarn
 RUN npm install -g yarn
-#RUN yarn config set registry https://registry.npm.taobao.org --global
-#RUN yarn config set disturl https://npm.taobao.org/dist --global
 
 ## Install react native
 RUN npm install -g react-native-cli react-native-maps
@@ -63,14 +59,8 @@ EXPOSE 8081
 # User creation
 
 RUN echo "root:root" | chpasswd
-#RUN userdel -r node
-#RUN deluser --remove-home node
-#RUN adduser --disabled-password --gecos '' $USERNAME
 RUN adduser $USERNAME plugdev
-
-# Add Tini
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
+RUN echo "$USERNAME ALL=NOPASSWD: ALL" >> /etc/sudoers
 
 RUN mkdir /home/$USERNAME/.android
 RUN chmod -R 755 $PROG
@@ -107,5 +97,3 @@ WORKDIR /home/$USERNAME/app
 
 # Tell gradle to store dependencies in a sub directory of the android project
 ENV GRADLE_USER_HOME /home/$USERNAME/app/android/gradle_deps
-
-ENTRYPOINT ["/tini", "--"]
