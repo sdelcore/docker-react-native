@@ -62,12 +62,13 @@ RUN echo "root:root" | chpasswd
 RUN adduser $USERNAME plugdev
 RUN echo "$USERNAME ALL=NOPASSWD: ALL" >> /etc/sudoers
 
+RUN mkdir /root/.android && touch /root/.android/repositories.cfg
 RUN mkdir /home/$USERNAME/.android
 RUN chmod -R 755 $PROG
 RUN chown -R $USERNAME:$USERNAME $PROG
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 
-USER $USERNAME
+#USER $USERNAME
 
 # Install Android SDK
 ## Install SDK
@@ -77,8 +78,7 @@ RUN mkdir "$ANDROID_HOME" .android \
     && unzip sdk.zip \
     && rm sdk.zip \
     && yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses \
-    && export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH:$ANDROID_HOME/tools/bin \
-    && rm $ANDROID_SDK_FILE
+    && export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH:$ANDROID_HOME/tools/bin
 	
 # Install android tools and system-image.
 ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/23.0.1
@@ -90,7 +90,7 @@ RUN $ANDROID_HOME/tools/bin/sdkmanager "tools" "platform-tools" \
         "platforms;android-24" "platforms;android-23" \
         "extras;android;m2repository" "extras;google;m2repository"
 
-RUN touch /home/$USERNAME/.android/repositories.cfg && /root/.android/repositories.cfg
+RUN touch /home/$USERNAME/.android/repositories.cfg
 
 # Set workdir
 # You'll need to run this image with a volume mapped to /home/dev (i.e. -v $(pwd):/home/dev) or override this value

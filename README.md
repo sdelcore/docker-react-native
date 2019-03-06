@@ -1,11 +1,5 @@
 # Usage
 ## Get image
-To clear all containers and images:
-```
-docker rmi $(docker ps -a -q)
-docker rmi $(docker images -q)
-```
-
 ```
 > git clone https://github.com/sdelcore/docker-react-native
 > cd docker-react-native
