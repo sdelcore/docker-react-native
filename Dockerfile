@@ -71,25 +71,26 @@ USER $USERNAME
 
 # Install Android SDK
 ## Install SDK
-RUN cd $PROG && \
-    wget $ANDROID_SDK_URL && \
-    unzip $ANDROID_SDK_FILE -d android-sdk-linux && \
-    export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH:$ANDROID_HOME/tools/bin && \
-    rm $ANDROID_SDK_FILE
-
-ADD license_accepter.sh /opt
-RUN $PROG/license_accepter.sh $ANDROID_HOME
-
+RUN mkdir "$ANDROID_HOME" .android \
+    && cd "$ANDROID_HOME" \
+    && curl -o sdk.zip $ANDROID_SDK_URL \
+    && unzip sdk.zip \
+    && rm sdk.zip \
+    && yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses \
+    && export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH:$ANDROID_HOME/tools/bin \
+    && rm $ANDROID_SDK_FILE
+	
 # Install android tools and system-image.
 ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/23.0.1
 RUN $ANDROID_HOME/tools/bin/sdkmanager --update
 RUN $ANDROID_HOME/tools/bin/sdkmanager "tools" "platform-tools" \
         "build-tools;26.0.2" "build-tools;25.0.3" \
+		"platforms;android-28" "platforms;android-27" \
         "platforms;android-26" "platforms;android-25" \
         "platforms;android-24" "platforms;android-23" \
         "extras;android;m2repository" "extras;google;m2repository"
 
-RUN touch /home/$USERNAME/.android/repositories.cfg
+RUN touch /home/$USERNAME/.android/repositories.cfg && /root/.android/repositories.cfg
 
 # Set workdir
 # You'll need to run this image with a volume mapped to /home/dev (i.e. -v $(pwd):/home/dev) or override this value
