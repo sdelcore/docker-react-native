@@ -24,19 +24,15 @@ RUN apt-get update -qy && \
 ## Install 32bit support for Android SDK
 RUN dpkg --add-architecture i386 && \
     apt-get update -qy && \
-    apt-get install -qy --no-install-recommends python-dev && \
+    apt-get install -qy --no-install-recommends sudo python-dev && \
     apt-get install -qy libncurses5:i386 libc6:i386 \
     	libstdc++6:i386 lib32gcc1 lib32ncurses5 \
     	lib32z1 zlib1g:i386 unzip usbutils tmux nano lsof
 
 # Install node modules
-#RUN npm config set registry https://registry.npm.taobao.org --global
-#RUN npm config set disturl https://npm.taobao.org/dist --global
 ## Install yarn
 RUN npm install -g yarn
-
-## Install react native
-RUN npm install -g react-native-cli react-native-maps
+RUN yarn global add npm react-native-cli react-devtools
 
 ## Clean up when done
 RUN apt-get clean && \
@@ -68,11 +64,11 @@ RUN chmod -R 755 $PROG
 RUN chown -R $USERNAME:$USERNAME $PROG
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 
-#USER $USERNAME
+USER $USERNAME
 
 # Install Android SDK
 ## Install SDK
-RUN mkdir "$ANDROID_HOME" .android \
+RUN mkdir "$ANDROID_HOME" \
     && cd "$ANDROID_HOME" \
     && curl -o sdk.zip $ANDROID_SDK_URL \
     && unzip sdk.zip \
@@ -81,7 +77,6 @@ RUN mkdir "$ANDROID_HOME" .android \
     && export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH:$ANDROID_HOME/tools/bin
 	
 # Install android tools and system-image.
-ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/23.0.1
 RUN $ANDROID_HOME/tools/bin/sdkmanager --update
 RUN $ANDROID_HOME/tools/bin/sdkmanager "tools" "platform-tools" \
         "build-tools;26.0.2" "build-tools;25.0.3" \
