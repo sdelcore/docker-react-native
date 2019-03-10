@@ -93,3 +93,4 @@ WORKDIR /home/$USERNAME/app
 
 # Tell gradle to store dependencies in a sub directory of the android project
 ENV GRADLE_USER_HOME /home/$USERNAME/app/android/gradle_deps
+PATH PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH:$ANDROID_HOME/tools/bin
